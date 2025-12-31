@@ -263,24 +263,29 @@
     </footer>
   </main>
 
-  
-  <!-- Intro overlay: password-scramble welcome -->
+  <script src="script.js?v=5" defer></script>
+
+
   <div id="intro" class="intro" aria-hidden="true">
-    <button id="skipIntro" class="intro-skip" type="button" aria-label="Skip intro">Skip</button>
+  <button id="skipIntro" class="intro-skip" type="button">Skip</button>
 
-    <div class="intro-box" role="dialog" aria-label="Site intro">
-      <div class="intro-kicker">Loading…</div>
-      <div class="intro-lines">
-        <div id="scrambleLine1" class="scramble-line" aria-live="polite"></div>
-        <div id="scrambleLine2" class="scramble-line scramble-line--sub"></div>
-      </div>
-      <div class="intro-tip">Tip: press <span class="kbd">Esc</span> to skip</div>
-      <div class="intro-bar" aria-hidden="true"></div>
-    </div>
-  </div>
-
-  <script src="script.js" defer></script>
+  <div class="morph-wrap">
+    <div class="morph-kicker">Building the model…</div>
 
 </body>
 
-  </html>
+  <!-- Intro overlay: Option B (equation morph) -->
+<div class="morph-main" aria-label="Intro equation morph">
+      <span id="morphText" class="morph-text">TM</span>
+      <span class="morph-cursor" aria-hidden="true"></span>
+    </div>
+
+    <div id="morphSub" class="morph-sub">
+      <span class="mono">y</span> → <span class="mono">θ</span> → <span class="mono">posterior</span>
+    </div>
+
+    <div class="morph-bar" aria-hidden="true"></div>
+  </div>
+</div>
+
+</html>

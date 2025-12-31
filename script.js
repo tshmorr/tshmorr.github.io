@@ -1,6 +1,10 @@
+console.log("✅ script.js loaded");
+
 document.getElementById("year")?.textContent = new Date().getFullYear();
 
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const WELCOME = "WELCOME TO MY WEBSITE";
+const MEET = "MEET TRACY SHARON MORRISON";
 
 function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
@@ -13,16 +17,14 @@ class TextScrambler {
     this.frameRequest = 0;
     this.resolve = () => {};
   }
-
   randomChar(){
     return this.chars[Math.floor(Math.random() * this.chars.length)];
   }
-
   setText(newText, { minStart = 0, maxStart = 18, minEnd = 16, maxEnd = 44 } = {}) {
     const oldText = this.el.textContent || "";
     const length = Math.max(oldText.length, newText.length);
-
     this.queue = [];
+
     for (let i = 0; i < length; i++) {
       const from = oldText[i] || "";
       const to = newText[i] || "";
@@ -39,7 +41,6 @@ class TextScrambler {
       this.update();
     });
   }
-
   update(){
     let output = "";
     let complete = 0;
@@ -69,8 +70,7 @@ class TextScrambler {
     this.el.innerHTML = output;
 
     if (complete === this.queue.length) {
-      const finalText = this.queue.map(q => q.to).join("");
-      this.el.textContent = finalText;
+      this.el.textContent = this.queue.map(q => q.to).join("");
       this.resolve();
     } else {
       this.frameRequest = requestAnimationFrame(() => {
@@ -79,7 +79,6 @@ class TextScrambler {
       });
     }
   }
-
   stop(){
     cancelAnimationFrame(this.frameRequest);
   }
@@ -91,52 +90,40 @@ function runIntroScramble(){
   const line1 = document.getElementById("scrambleLine1");
   const line2 = document.getElementById("scrambleLine2");
 
-  const WELCOME = "WELCOME TO MY WEBSITE";
-  const MEET = "MEET TRACY SHARON MORRISON";
-
   const finish = () => {
     intro?.classList.add("hidden");
     document.body.classList.add("loaded");
   };
 
-  if (!intro || !line1 || !line2) {
-    document.body.classList.add("loaded");
-    return;
-  }
-
-  if (prefersReducedMotion) {
-    line1.textContent = WELCOME;
-    line2.textContent = MEET;
-    finish();
-    return;
-  }
-
-  const s1 = new TextScrambler(line1);
-  const s2 = new TextScrambler(line2);
+  // If HTML doesn't match what we expect, DO NOT trap the user.
+  if (!intro) { document.body.classList.add("loaded"); return; }
+  if (!line1 || !line2) { finish(); return; }
 
   const hardFinish = () => {
-    s1.stop(); s2.stop();
     line1.textContent = WELCOME;
     line2.textContent = MEET;
     finish();
   };
 
   skipBtn?.addEventListener("click", hardFinish);
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") hardFinish();
-  });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") hardFinish(); });
+
+  if (prefersReducedMotion) { hardFinish(); return; }
+
+  const s1 = new TextScrambler(line1);
+  const s2 = new TextScrambler(line2);
 
   (async () => {
-    await sleep(250);
-    await s1.setText(WELCOME, { minStart: 0, maxStart: 12, minEnd: 18, maxEnd: 48 });
+    await sleep(200);
+    await s1.setText(WELCOME, { minStart: 0, maxStart: 12, minEnd: 18, maxEnd: 46 });
     await sleep(120);
-    await s2.setText(MEET, { minStart: 0, maxStart: 16, minEnd: 18, maxEnd: 56 });
+    await s2.setText(MEET, { minStart: 0, maxStart: 16, minEnd: 18, maxEnd: 54 });
     await sleep(450);
     finish();
   })();
 }
 
-runIntroScramble();
+document.addEventListener("DOMContentLoaded", runIntroScramble);
 
 
 // show more projects

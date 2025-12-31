@@ -447,3 +447,250 @@ code{ color: var(--accent); }
   .grid{ grid-template-columns: 1fr; }
   .contact-title{ font-size: 44px; }
 }
+
+/* ===== Intro overlay ===== */
+.intro{
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: radial-gradient(900px 500px at 20% 10%, rgba(243,201,105,0.10), transparent 55%),
+              rgba(11,15,20,0.96);
+  display: grid;
+  place-items: center;
+  transition: opacity 450ms ease, visibility 450ms ease;
+}
+
+.intro.hidden{
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.intro-box{
+  width: min(860px, calc(100% - 40px));
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.03);
+  box-shadow: 0 20px 70px rgba(0,0,0,0.45);
+  padding: 18px 18px 16px;
+  position: relative;
+}
+
+.intro-badge{
+  width: 56px;
+  height: 56px;
+  border: 2px solid var(--accent);
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+.intro-text{
+  margin: 0;
+  min-height: 190px;
+  white-space: pre-wrap;
+  line-height: 1.55;
+  font-size: 14px;
+  color: rgba(255,255,255,0.78);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
+.intro-cursor{
+  width: 10px;
+  height: 18px;
+  background: var(--accent);
+  display: inline-block;
+  margin-left: 6px;
+  animation: blink 1s steps(1) infinite;
+  vertical-align: text-bottom;
+}
+
+@keyframes blink{
+  50%{ opacity: 0; }
+}
+
+.intro-skip{
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  border: 1px solid rgba(243,201,105,0.5);
+  background: transparent;
+  color: var(--accent);
+  border-radius: 12px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+.intro-skip:hover{ background: rgba(243,201,105,0.08); }
+
+/* ===== Sequential reveal after intro ===== */
+.stagger .kicker,
+.stagger .headline,
+.stagger .lede,
+.stagger .btn{
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+body.loaded .stagger .kicker{ animation: fadeUp 550ms ease forwards; animation-delay: 120ms; }
+body.loaded .stagger .headline{ animation: fadeUp 650ms ease forwards; animation-delay: 220ms; }
+body.loaded .stagger .lede{ animation: fadeUp 650ms ease forwards; animation-delay: 360ms; }
+body.loaded .stagger .btn{ animation: fadeUp 650ms ease forwards; animation-delay: 520ms; }
+
+@keyframes fadeUp{
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Scroll reveal for sections ===== */
+.reveal{
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 600ms ease, transform 600ms ease;
+}
+.reveal.show{
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .intro, .intro *{ animation: none !important; transition: none !important; }
+  .reveal{ opacity: 1; transform: none; }
+  .stagger .kicker, .stagger .headline, .stagger .lede, .stagger .btn{
+    opacity: 1; transform: none;
+  }
+}
+
+/* ===== Intro overlay (Option B: equation morph) ===== */
+.intro{
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: radial-gradient(900px 500px at 25% 10%, rgba(243,201,105,0.10), transparent 60%),
+              radial-gradient(900px 500px at 80% 0%, rgba(243,201,105,0.06), transparent 55%),
+              rgba(11,15,20,0.96);
+  display: grid;
+  place-items: center;
+  transition: opacity 450ms ease, visibility 450ms ease;
+}
+
+.intro.hidden{
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.intro-skip{
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  border: 1px solid rgba(243,201,105,0.5);
+  background: transparent;
+  color: var(--accent);
+  border-radius: 12px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+.intro-skip:hover{ background: rgba(243,201,105,0.08); }
+
+.morph-wrap{
+  width: min(860px, calc(100% - 40px));
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.03);
+  box-shadow: 0 20px 70px rgba(0,0,0,0.45);
+  padding: 22px 20px 18px;
+}
+
+.morph-kicker{
+  color: rgba(255,255,255,0.65);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+.morph-main{
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.morph-text{
+  font-family: ui-serif, Georgia, "Times New Roman", serif;
+  font-size: clamp(54px, 8vw, 92px);
+  line-height: 1.0;
+  letter-spacing: 0.5px;
+  color: rgba(255,255,255,0.92);
+  text-shadow: 0 20px 70px rgba(0,0,0,0.45);
+  transition: transform 380ms ease, filter 380ms ease, opacity 380ms ease;
+}
+
+.morph-cursor{
+  width: 10px;
+  height: 22px;
+  background: var(--accent);
+  display: inline-block;
+  animation: blink 1s steps(1) infinite;
+  transform: translateY(-6px);
+}
+@keyframes blink{ 50%{ opacity: 0; } }
+
+.morph-sub{
+  margin-top: 10px;
+  color: rgba(255,255,255,0.65);
+  font-size: 14px;
+}
+.mono{
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: rgba(243,201,105,0.92);
+}
+
+.morph-bar{
+  margin-top: 14px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(243,201,105,0.0), rgba(243,201,105,0.55), rgba(243,201,105,0.0));
+  opacity: 0.9;
+}
+
+/* Morph effect helpers (JS toggles these) */
+.morph-out{
+  opacity: 0;
+  transform: translateY(6px) scale(0.985);
+  filter: blur(6px);
+}
+
+.morph-in{
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+/* ===== Sequential reveal after intro (keep this) ===== */
+.stagger .kicker,
+.stagger .headline,
+.stagger .lede,
+.stagger .btn{
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+body.loaded .stagger .kicker{ animation: fadeUp 550ms ease forwards; animation-delay: 120ms; }
+body.loaded .stagger .headline{ animation: fadeUp 650ms ease forwards; animation-delay: 220ms; }
+body.loaded .stagger .lede{ animation: fadeUp 650ms ease forwards; animation-delay: 360ms; }
+body.loaded .stagger .btn{ animation: fadeUp 650ms ease forwards; animation-delay: 520ms; }
+
+@keyframes fadeUp{
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .intro, .intro *{ animation: none !important; transition: none !important; }
+  .morph-text{ filter:none !important; transform:none !important; opacity:1 !important; }
+  .stagger .kicker, .stagger .headline, .stagger .lede, .stagger .btn{
+    opacity: 1; transform: none;
+  }
+}

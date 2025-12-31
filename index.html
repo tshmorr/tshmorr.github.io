@@ -9,27 +9,6 @@
 </head>
 
 <body>
-  <!-- Intro overlay: Option B (password-scramble welcome) -->
-  <div id="intro" class="intro" aria-hidden="true">
-    <button id="skipIntro" class="intro-skip" type="button">Skip</button>
-
-    <div class="intro-card" role="dialog" aria-label="Intro loading screen">
-      <div class="intro-kicker">Loading…</div>
-
-      <h1 class="intro-title">
-        <span id="scrambleLine1" class="scramble"></span>
-        <span class="scramble-cursor" aria-hidden="true"></span>
-      </h1>
-
-      <p class="intro-sub">
-        <span id="scrambleLine2" class="scramble"></span>
-      </p>
-
-      <div class="intro-hint">Tip: press <span class="kbd">Esc</span> to skip</div>
-    </div>
-  </div>
-
-
   <!-- Left social rail -->
   <aside class="rail rail-left" aria-label="Social links">
     <a class="icon" href="https://github.com/tshmorr" target="_blank" rel="noreferrer" aria-label="GitHub">
@@ -84,7 +63,7 @@
 
   <main class="container">
     <!-- HERO -->
-    <section class="hero stagger" id="top">
+    <section class="hero" id="top">
       <p class="kicker">Hey there! My name is</p>
       <h1 class="headline">
         Tracy Morrison<span class="dot">.</span><br/>
@@ -284,7 +263,24 @@
     </footer>
   </main>
 
-  <script src="script.js"></script>
+  
+  <!-- Intro overlay: password-scramble welcome -->
+  <div id="intro" class="intro" aria-hidden="true">
+    <button id="skipIntro" class="intro-skip" type="button" aria-label="Skip intro">Skip</button>
+
+    <div class="intro-box" role="dialog" aria-label="Site intro">
+      <div class="intro-kicker">Loading…</div>
+      <div class="intro-lines">
+        <div id="scrambleLine1" class="scramble-line" aria-live="polite"></div>
+        <div id="scrambleLine2" class="scramble-line scramble-line--sub"></div>
+      </div>
+      <div class="intro-tip">Tip: press <span class="kbd">Esc</span> to skip</div>
+      <div class="intro-bar" aria-hidden="true"></div>
+    </div>
+  </div>
+
+  <script src="script.js" defer></script>
+
 </body>
 
-</html>
+  </html>

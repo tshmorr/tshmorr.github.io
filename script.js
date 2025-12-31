@@ -1,155 +1,124 @@
-console.log("✅ script.js loaded");
-
+// year in footer
 document.getElementById("year")?.textContent = new Date().getFullYear();
 
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-const WELCOME = "Welcome to my website,";
-const MEET = "Meet Tracy Sharon Morrison."; 
 
 function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
-class TextScrambler {
-  constructor(el, { chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*+-=?" } = {}) {
-    this.el = el;
-    this.chars = chars;
-    this.queue = [];
-    this.frame = 0;
-    this.frameRequest = 0;
-    this.resolve = () => {};
-  }
-  randomChar(){
-    return this.chars[Math.floor(Math.random() * this.chars.length)];
-  }
-  setText(newText, { minStart = 0, maxStart = 18, minEnd = 16, maxEnd = 44 } = {}) {
-    const oldText = this.el.textContent || "";
-    const length = Math.max(oldText.length, newText.length);
-    this.queue = [];
 
-    for (let i = 0; i < length; i++) {
-      const from = oldText[i] || "";
-      const to = newText[i] || "";
-      const start = minStart + Math.floor(Math.random() * (maxStart - minStart + 1));
-      const end = start + minEnd + Math.floor(Math.random() * (maxEnd - minEnd + 1));
-      this.queue.push({ from, to, start, end, char: "" });
-    }
+function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
-    cancelAnimationFrame(this.frameRequest);
-    this.frame = 0;
-
-    return new Promise(resolve => {
-      this.resolve = resolve;
-      this.update();
-    });
-  }
-  update(){
-    let output = "";
-    let complete = 0;
-
-    for (let i = 0; i < this.queue.length; i++) {
-      const { from, to, start, end } = this.queue[i];
-
-      if (to === " ") {
-        output += " ";
-        if (this.frame >= end) complete++;
-        continue;
-      }
-
-      if (this.frame >= end) {
-        complete++;
-        output += to;
-      } else if (this.frame >= start) {
-        if (!this.queue[i].char || Math.random() < 0.28) {
-          this.queue[i].char = this.randomChar();
-        }
-        output += `<span class="dud">${this.queue[i].char}</span>`;
-      } else {
-        output += from;
-      }
-    }
-
-    this.el.innerHTML = output;
-
-    if (complete === this.queue.length) {
-      this.el.textContent = this.queue.map(q => q.to).join("");
-      this.resolve();
-    } else {
-      this.frameRequest = requestAnimationFrame(() => {
-        this.frame++;
-        this.update();
-      });
-    }
-  }
-  stop(){
-    cancelAnimationFrame(this.frameRequest);
-  }
-}
-
-function runIntroScramble(){
+/**
+ * Intro: password-crack / scramble animation.
+ * Robust behavior:
+ * - Intro overlay is hidden by default; we turn it on only if JS is running.
+ * - Esc + Skip always work (capture listener).
+ * - Hard timeout prevents "stuck" state.
+ */
+async function runIntroScramble(){
   const intro = document.getElementById("intro");
   const skipBtn = document.getElementById("skipIntro");
   const line1 = document.getElementById("scrambleLine1");
   const line2 = document.getElementById("scrambleLine2");
 
-  // If HTML doesn't match what we expect, DO NOT trap the user.
-  if (!intro) { document.body.classList.add("loaded"); return; }
-
-  // Only show the overlay if JS is actually running.
-  document.body.classList.add("intro-on");
-  intro.setAttribute("aria-hidden", "false");
-
-  let failSafeTimer = null;
-
-  const finish = () => {
-    if (failSafeTimer) window.clearTimeout(failSafeTimer);
-    intro.classList.add("hidden");
+  // If markup isn't present, never block the page.
+  if (!intro || !line1 || !line2){
     document.body.classList.add("loaded");
-    document.body.classList.remove("intro-on");
-  };
-
-  if (!line1 || !line2) { finish(); return; }
-
-  const hardFinish = () => {
-    line1.textContent = WELCOME;
-    line2.textContent = MEET;
-    finish();
-  };
-
-  // Fail-safe: if anything goes wrong, exit the intro quickly.
-  failSafeTimer = window.setTimeout(hardFinish, 6500);
-
-  skipBtn?.addEventListener("click", hardFinish);
-  window.addEventListener("keydown", (e) => { if (e.key === "Escape") hardFinish(); }, { capture: true });
-
-  if (prefersReducedMotion) { hardFinish(); return; }
-
-  const s1 = new TextScrambler(line1);
-  const s2 = new TextScrambler(line2);
-
-  (async () => {
-    try{
-      await sleep(150);
-      await s1.setText(WELCOME, { minStart: 0, maxStart: 10, minEnd: 18, maxEnd: 44 });
-      await sleep(120);
-      await s2.setText(MEET, { minStart: 0, maxStart: 12, minEnd: 18, maxEnd: 50 });
-      await sleep(420);
-      finish();
-    }catch(err){
-      console.error("Intro animation failed:", err);
-      hardFinish();
-    }
-  })();
-}
-
-
-// Run intro even if the script loads after DOMContentLoaded (e.g., cached/hard reload edge cases)
-(() => {
-  const start = () => runIntroScramble();
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", start);
-  } else {
-    start();
+    return;
   }
-})();
+
+  // Turn on overlay now that JS is confirmed running.
+  document.body.classList.add("intro-on");
+
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  let done = false;
+  const finish = () => {
+    if (done) return;
+    done = true;
+    intro.classList.add("hidden");
+    document.body.classList.remove("intro-on");
+    document.body.classList.add("loaded");
+    window.removeEventListener("keydown", onKeyDown, true);
+  };
+
+  const onKeyDown = (e) => {
+    if (e.key === "Escape") finish();
+  };
+
+  // Esc should work even if focus is inside something else.
+  window.addEventListener("keydown", onKeyDown, true);
+  skipBtn?.addEventListener("click", finish);
+
+  // Absolute failsafe
+  const failsafe = window.setTimeout(finish, 6500);
+
+  if (prefersReducedMotion){
+    line1.textContent = "Welcome to my website,";
+    line2.textContent = "Meet Tracy Sharon Morrison.";
+    window.clearTimeout(failsafe);
+    await sleep(300);
+    finish();
+    return;
+  }
+
+  const target1 = "Welcome to my website,";
+  const target2 = "Meet Tracy Sharon Morrison.";
+
+  const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{};:,.?/\\|~";
+  const scrambleText = (el, target, { stepMs = 22, settleMs = 650 } = {}) => {
+    return new Promise((resolve) => {
+      const len = target.length;
+      let frame = 0;
+      // Each character settles at a slightly different time for a "password crack" feel.
+      const settleAt = Array.from({ length: len }, (_, i) => Math.floor(8 + i * 1.6 + Math.random() * 10));
+      const maxFrame = Math.max(...settleAt) + 8;
+
+      const tick = () => {
+        let out = "";
+        for (let i = 0; i < len; i++){
+          const ch = target[i];
+          if (ch === " "){
+            out += " ";
+            continue;
+          }
+          if (frame >= settleAt[i]){
+            out += ch;
+          } else {
+            out += charset[Math.floor(Math.random() * charset.length)];
+          }
+        }
+        // add a blinking cursor at the end
+        el.innerHTML = out + ' <span class="scramble-cursor" aria-hidden="true"></span>';
+
+        frame++;
+        if (frame <= maxFrame){
+          window.setTimeout(tick, stepMs);
+        } else {
+          // settle fully (remove cursor)
+          el.textContent = target;
+          window.setTimeout(resolve, settleMs);
+        }
+      };
+
+      tick();
+    });
+  };
+
+  // Run sequence
+  line1.textContent = "";
+  line2.textContent = "";
+  await sleep(220);
+  await scrambleText(line1, target1, { stepMs: 18, settleMs: 320 });
+  await scrambleText(line2, target2, { stepMs: 16, settleMs: 450 });
+
+  window.clearTimeout(failsafe);
+  await sleep(250);
+  finish();
+}
+window.addEventListener("load", runIntroScramble);
+
+
 
 // show more projects
 const showMoreBtn = document.getElementById("showMoreBtn");

@@ -458,20 +458,9 @@ code{ color: var(--accent); }
   display: grid;
   place-items: center;
   transition: opacity 450ms ease, visibility 450ms ease;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
 }
 
-.intro.hidden
-
-body.intro-on .intro{
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
-
-{
+.intro.hidden{
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -707,83 +696,16 @@ body.loaded .stagger .btn{ animation: fadeUp 650ms ease forwards; animation-dela
 }
 
 
+/* Intro scramble helper */
+.dud{opacity:0.35;}
 
-/* ===== Intro: password-scramble welcome ===== */
-.intro-box{
-  width: min(920px, calc(100vw - 64px));
-  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
-  border: 1px solid rgba(255,255,255,0.10);
-  border-radius: 18px;
-  padding: 28px 28px 22px;
-  box-shadow: 0 18px 60px rgba(0,0,0,0.45);
-  backdrop-filter: blur(10px);
-}
-
-.intro-kicker{
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 12px;
-  letter-spacing: 0.14em;
-  color: rgba(255,255,255,0.65);
-  text-transform: uppercase;
-  margin-bottom: 18px;
-}
-
-.intro-lines{
-  display: grid;
-  gap: 10px;
-}
-
-.scramble-line{
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: clamp(18px, 2.4vw, 34px);
+/* Make intro text read like sentences (not giant symbols) */
+.intro.intro-scramble .morph-main{
+  font-size: clamp(26px, 4vw, 46px);
+  letter-spacing: 0.02em;
   line-height: 1.2;
-  color: rgba(255,255,255,0.92);
-  min-height: 1.3em;
-  white-space: pre-wrap;
 }
-
-.scramble-line--sub{
-  font-size: clamp(14px, 1.6vw, 20px);
-  color: rgba(255,255,255,0.70);
-}
-
-.scramble-cursor{
-  display: inline-block;
-  width: 10px;
-  height: 1em;
-  transform: translateY(2px);
-  border-radius: 2px;
-  background: var(--accent);
-  margin-left: 6px;
-  animation: blink 900ms steps(1) infinite;
-}
-
-@keyframes blink{
-  0%, 49%{ opacity: 1; }
-  50%, 100%{ opacity: 0; }
-}
-
-.intro-tip{
-  margin-top: 16px;
-  color: rgba(255,255,255,0.55);
-  font-size: 13px;
-}
-
-.kbd{
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.18);
-  background: rgba(255,255,255,0.06);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 12px;
-  color: rgba(255,255,255,0.85);
-}
-
-.intro-bar{
-  margin-top: 18px;
-  height: 3px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--accent), transparent);
-  opacity: 0.65;
+.intro.intro-scramble .morph-sub{
+  font-size: 16px;
+  opacity: 0.9;
 }

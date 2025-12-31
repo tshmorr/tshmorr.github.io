@@ -1,18 +1,11 @@
-// year in footer
 document.getElementById("year")?.textContent = new Date().getFullYear();
 
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
-/**
- * Password-scramble text effect (per-character "cracking" until it resolves).
- * Based on a requestAnimationFrame loop for smoothness.
- */
 class TextScrambler {
-  constructor(el, {
-    chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*+-=?"
-  } = {}) {
+  constructor(el, { chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*+-=?" } = {}) {
     this.el = el;
     this.chars = chars;
     this.queue = [];
@@ -25,10 +18,7 @@ class TextScrambler {
     return this.chars[Math.floor(Math.random() * this.chars.length)];
   }
 
-  setText(newText, {
-    minStart = 0, maxStart = 18,
-    minEnd = 16, maxEnd = 44
-  } = {}) {
+  setText(newText, { minStart = 0, maxStart = 18, minEnd = 16, maxEnd = 44 } = {}) {
     const oldText = this.el.textContent || "";
     const length = Math.max(oldText.length, newText.length);
 
@@ -57,7 +47,6 @@ class TextScrambler {
     for (let i = 0; i < this.queue.length; i++) {
       const { from, to, start, end } = this.queue[i];
 
-      // Preserve spaces cleanly
       if (to === " ") {
         output += " ";
         if (this.frame >= end) complete++;
@@ -68,7 +57,6 @@ class TextScrambler {
         complete++;
         output += to;
       } else if (this.frame >= start) {
-        // show random characters while "cracking"
         if (!this.queue[i].char || Math.random() < 0.28) {
           this.queue[i].char = this.randomChar();
         }
@@ -81,7 +69,6 @@ class TextScrambler {
     this.el.innerHTML = output;
 
     if (complete === this.queue.length) {
-      // lock to final textContent for accessibility / copy-paste
       const finalText = this.queue.map(q => q.to).join("");
       this.el.textContent = finalText;
       this.resolve();
@@ -112,13 +99,11 @@ function runIntroScramble(){
     document.body.classList.add("loaded");
   };
 
-  // If intro markup isn't present, just reveal the page
   if (!intro || !line1 || !line2) {
     document.body.classList.add("loaded");
     return;
   }
 
-  // Reduced motion: no intro animation
   if (prefersReducedMotion) {
     line1.textContent = WELCOME;
     line2.textContent = MEET;
@@ -136,25 +121,21 @@ function runIntroScramble(){
     finish();
   };
 
-  // Skip controls
   skipBtn?.addEventListener("click", hardFinish);
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") hardFinish();
   });
 
-  // Play sequence
   (async () => {
     await sleep(250);
     await s1.setText(WELCOME, { minStart: 0, maxStart: 12, minEnd: 18, maxEnd: 48 });
     await sleep(120);
     await s2.setText(MEET, { minStart: 0, maxStart: 16, minEnd: 18, maxEnd: 56 });
-
     await sleep(450);
     finish();
   })();
 }
 
-// Start intro as soon as DOM is ready (script is at the end of <body>, so this is immediate)
 runIntroScramble();
 
 

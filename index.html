@@ -9,19 +9,27 @@
 </head>
 
 <body>
-  <!-- Intro overlay -->
-  <div id="intro" class="intro" aria-hidden="false">
-    <button id="skipIntro" class="skip-btn" type="button" aria-label="Skip intro">Skip</button>
-    <div class="intro-panel" role="status" aria-live="polite">
+  <!-- Intro overlay: Option B (password-scramble welcome) -->
+  <div id="intro" class="intro" aria-hidden="true">
+    <button id="skipIntro" class="intro-skip" type="button">Skip</button>
+
+    <div class="intro-card" role="dialog" aria-label="Intro loading screen">
       <div class="intro-kicker">Loading…</div>
-      <div class="scramble-wrap">
-        <div id="scrambleLine1" class="scramble"></div>
-        <div id="scrambleLine2" class="scramble scramble-sub"></div>
-      </div>
-      <div class="intro-tip">Tip: press <kbd>Esc</kbd> to skip</div>
-      <div class="intro-progress" aria-hidden="true"><span></span></div>
+
+      <h1 class="intro-title">
+        <span id="scrambleLine1" class="scramble"></span>
+        <span class="scramble-cursor" aria-hidden="true"></span>
+      </h1>
+
+      <p class="intro-sub">
+        <span id="scrambleLine2" class="scramble"></span>
+      </p>
+
+      <div class="intro-hint">Tip: press <span class="kbd">Esc</span> to skip</div>
     </div>
   </div>
+
+
   <!-- Left social rail -->
   <aside class="rail rail-left" aria-label="Social links">
     <a class="icon" href="https://github.com/tshmorr" target="_blank" rel="noreferrer" aria-label="GitHub">
@@ -113,11 +121,11 @@
         </div>
 
         <div class="portrait">
-          <!-- Optional: replace with your photo in /assets/headshot.png -->
+          <!-- Optional: replace with your photo in /assets/headshot.jpg -->
           <div class="portrait-frame">
-            <img src="assets/headshot.png" alt="Portrait" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';" />
+            <img src="assets/headshot.jpg" alt="Portrait" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';" />
             <div class="portrait-fallback" style="display:none;">
-              <span>Add <code>assets/headshot.png</code></span>
+              <span>Add <code>assets/headshot.jpg</code></span>
             </div>
           </div>
         </div>
@@ -276,10 +284,7 @@
     </footer>
   </main>
 
-  <script src="script.js?v=2" defer></script>
+  <script src="script.js"></script>
 </body>
-
-  <!-- Intro overlay: Option B (equation morph) -->
-
 
 </html>

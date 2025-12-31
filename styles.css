@@ -694,3 +694,80 @@ body.loaded .stagger .btn{ animation: fadeUp 650ms ease forwards; animation-dela
     opacity: 1; transform: none;
   }
 }
+
+/* ===== Intro overlay (Option B: password-scramble welcome) ===== */
+.intro-card{
+  width: min(860px, calc(100% - 40px));
+  padding: 26px 26px 22px;
+  border-radius: 20px;
+  background: rgba(16, 20, 26, 0.62);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow: 0 24px 70px rgba(0,0,0,0.55);
+  backdrop-filter: blur(14px);
+}
+
+.intro-kicker{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: rgba(226, 232, 240, 0.7);
+  margin-bottom: 10px;
+}
+
+.intro-title{
+  margin: 0;
+  font-size: clamp(28px, 5vw, 44px);
+  line-height: 1.05;
+  font-weight: 700;
+  color: rgba(226, 232, 240, 0.95);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.intro-sub{
+  margin: 12px 0 0;
+  font-size: clamp(14px, 2.3vw, 18px);
+  line-height: 1.6;
+  color: rgba(226, 232, 240, 0.78);
+}
+
+.scramble{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  letter-spacing: 0.02em;
+}
+
+.scramble .dud{
+  color: rgba(243, 201, 105, 0.85);
+  opacity: 0.7;
+}
+
+.scramble-cursor{
+  display: inline-block;
+  width: 10px;
+  height: 0.95em;
+  transform: translateY(0.08em);
+  border-radius: 2px;
+  background: var(--accent);
+  animation: blink 1s steps(2, start) infinite;
+}
+
+.intro-hint{
+  margin-top: 14px;
+  font-size: 12px;
+  color: rgba(226, 232, 240, 0.55);
+}
+
+.kbd{
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 8px;
+  border: 1px solid rgba(148,163,184,0.22);
+  background: rgba(148,163,184,0.08);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+/* Make sure the hero reveal hooks actually apply */
+.hero.stagger .btn{ display: inline-flex; }
+

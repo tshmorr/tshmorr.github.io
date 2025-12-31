@@ -455,10 +455,12 @@ code{ color: var(--accent); }
   z-index: 999;
   background: radial-gradient(900px 500px at 20% 10%, rgba(243,201,105,0.10), transparent 55%),
               rgba(11,15,20,0.96);
-  display: grid;
+  display: none;
   place-items: center;
   transition: opacity 450ms ease, visibility 450ms ease;
 }
+
+body.intro-on .intro{ display: grid; }
 
 .intro.hidden{
   opacity: 0;
@@ -527,10 +529,10 @@ code{ color: var(--accent); }
 .intro-skip:hover{ background: rgba(243,201,105,0.08); }
 
 /* ===== Sequential reveal after intro ===== */
-.stagger .kicker,
-.stagger .headline,
-.stagger .lede,
-.stagger .btn{
+body.intro-on:not(.loaded) .stagger .kicker,
+body.intro-on:not(.loaded) .stagger .headline,
+body.intro-on:not(.loaded) .stagger .lede,
+body.intro-on:not(.loaded) .stagger .btn{
   opacity: 0;
   transform: translateY(10px);
 }
@@ -695,110 +697,79 @@ body.loaded .stagger .btn{ animation: fadeUp 650ms ease forwards; animation-dela
   }
 }
 
-/* ==========================
-   Intro overlay (scramble)
-   ========================== */
-.intro{
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: radial-gradient(800px 400px at 50% 35%, rgba(255,255,255,0.06), transparent 60%),
-              rgba(7,10,16,0.92);
-  backdrop-filter: blur(6px);
-  z-index: 9999;
-  padding: 24px;
-}
-
-.intro.hidden{
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 350ms ease;
-}
-
-.intro-panel{
-  width: min(900px, 92vw);
-  border-radius: 18px;
-  padding: 22px 26px 18px;
-  border: 1px solid rgba(255,255,255,0.10);
-  background: rgba(11,14,20,0.65);
-  box-shadow: 0 20px 70px rgba(0,0,0,0.55);
-}
-
-.skip-btn{
-  position: fixed;
-  top: 18px;
-  right: 18px;
-  padding: 10px 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(249,203,64,0.45);
-  background: rgba(12,14,18,0.55);
-  color: var(--accent, #f9cb40);
-  cursor: pointer;
+/* ===== Intro overlay (Option B: password-scramble welcome) ===== */
+.intro-card{
+  width: min(860px, calc(100% - 40px));
+  padding: 26px 26px 22px;
+  border-radius: 20px;
+  background: rgba(16, 20, 26, 0.62);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow: 0 24px 70px rgba(0,0,0,0.55);
+  backdrop-filter: blur(14px);
 }
 
 .intro-kicker{
-  letter-spacing: .12em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   font-size: 12px;
-  opacity: .65;
-  margin-bottom: 14px;
+  color: rgba(226, 232, 240, 0.7);
+  margin-bottom: 10px;
 }
 
-.scramble-wrap{
-  display: grid;
-  gap: 10px;
+.intro-title{
+  margin: 0;
+  font-size: clamp(28px, 5vw, 44px);
+  line-height: 1.05;
+  font-weight: 700;
+  color: rgba(226, 232, 240, 0.95);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.intro-sub{
+  margin: 12px 0 0;
+  font-size: clamp(14px, 2.3vw, 18px);
+  line-height: 1.6;
+  color: rgba(226, 232, 240, 0.78);
 }
 
 .scramble{
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  font-size: clamp(18px, 2.2vw, 28px);
-  line-height: 1.2;
+  letter-spacing: 0.02em;
 }
 
-.scramble-sub{
-  font-size: clamp(14px, 1.6vw, 18px);
-  opacity: .8;
+.scramble .dud{
+  color: rgba(243, 201, 105, 0.85);
+  opacity: 0.7;
 }
 
-.dud{
-  opacity: .55;
+.scramble-cursor{
+  display: inline-block;
+  width: 10px;
+  height: 0.95em;
+  transform: translateY(0.08em);
+  border-radius: 2px;
+  background: var(--accent);
+  animation: blink 1s steps(2, start) infinite;
 }
 
-.intro-tip{
+.intro-hint{
   margin-top: 14px;
-  font-size: 13px;
-  opacity: .7;
-}
-
-.intro-tip kbd{
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 12px;
-  padding: 2px 7px;
+  color: rgba(226, 232, 240, 0.55);
+}
+
+.kbd{
+  display: inline-block;
+  padding: 2px 6px;
   border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.18);
-  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(148,163,184,0.22);
+  background: rgba(148,163,184,0.08);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
-.intro-progress{
-  margin-top: 14px;
-  height: 6px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.08);
-  overflow: hidden;
-}
+/* Make sure the hero reveal hooks actually apply */
+.hero.stagger .btn{ display: inline-flex; }
 
-.intro-progress > span{
-  display: block;
-  height: 100%;
-  width: 35%;
-  border-radius: 999px;
-  background: rgba(249,203,64,0.75);
-  animation: introBar 1.2s ease-in-out infinite alternate;
-}
-
-@keyframes introBar{
-  from { transform: translateX(-10%); }
-  to { transform: translateX(220%); }
-}

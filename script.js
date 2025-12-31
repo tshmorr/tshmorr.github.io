@@ -1,28 +1,15 @@
-// year in footer
+console.log("✅ script.js loaded");
+
 document.getElementById("year")?.textContent = new Date().getFullYear();
 
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const WELCOME = "Welcome to my website,";
+const MEET = "Meet Tracy Sharon Morrison."; 
 
 function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
-async function morphTo(el, newText, subEl, newSub){
-  // animate out
-  el.classList.add("morph-out");
-  el.classList.remove("morph-in");
-  await sleep(240);
-
-  // swap
-  el.textContent = newText;
-  if (subEl && newSub) subEl.innerHTML = newSub;
-
-  // animate in
-  el.classList.remove("morph-out");
-  el.classList.add("morph-in");
-  await sleep(360);
-}
-
-class TextScramble {
-  constructor(el, { chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*+-_?=" } = {}) {
+class TextScrambler {
+  constructor(el, { chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*+-=?" } = {}) {
     this.el = el;
     this.chars = chars;
     this.queue = [];
@@ -30,11 +17,9 @@ class TextScramble {
     this.frameRequest = 0;
     this.resolve = () => {};
   }
-
-  randomChar() {
+  randomChar(){
     return this.chars[Math.floor(Math.random() * this.chars.length)];
   }
-
   setText(newText, { minStart = 0, maxStart = 18, minEnd = 16, maxEnd = 44 } = {}) {
     const oldText = this.el.textContent || "";
     const length = Math.max(oldText.length, newText.length);
@@ -56,13 +41,18 @@ class TextScramble {
       this.update();
     });
   }
-
-  update() {
+  update(){
     let output = "";
     let complete = 0;
 
     for (let i = 0; i < this.queue.length; i++) {
       const { from, to, start, end } = this.queue[i];
+
+      if (to === " ") {
+        output += " ";
+        if (this.frame >= end) complete++;
+        continue;
+      }
 
       if (this.frame >= end) {
         complete++;
@@ -80,80 +70,86 @@ class TextScramble {
     this.el.innerHTML = output;
 
     if (complete === this.queue.length) {
+      this.el.textContent = this.queue.map(q => q.to).join("");
       this.resolve();
     } else {
-      this.frameRequest = requestAnimationFrame(() => this.update());
-      this.frame++;
+      this.frameRequest = requestAnimationFrame(() => {
+        this.frame++;
+        this.update();
+      });
     }
+  }
+  stop(){
+    cancelAnimationFrame(this.frameRequest);
   }
 }
 
-async function runIntroScramble(){
+function runIntroScramble(){
   const intro = document.getElementById("intro");
   const skipBtn = document.getElementById("skipIntro");
   const line1 = document.getElementById("scrambleLine1");
   const line2 = document.getElementById("scrambleLine2");
 
-  // If the overlay isn't present, reveal content immediately.
-  if (!intro || !line1 || !line2) {
-    document.body.classList.add("loaded");
-    return;
-  }
+  // If HTML doesn't match what we expect, DO NOT trap the user.
+  if (!intro) { document.body.classList.add("loaded"); return; }
 
-  // reduced motion: skip animation
-  if (prefersReducedMotion){
-    intro.classList.add("hidden");
-    intro.setAttribute("aria-hidden", "true");
-    document.body.classList.add("loaded");
-    return;
-  }
+  // Only show the overlay if JS is actually running.
+  document.body.classList.add("intro-on");
+  intro.setAttribute("aria-hidden", "false");
 
-  let done = false;
-  let killTimer = null;
-
-  const onKeyDown = (e) => {
-    if (e.key === "Escape") finish();
-  };
+  let failSafeTimer = null;
 
   const finish = () => {
-    if (done) return;
-    done = true;
-    if (killTimer) clearTimeout(killTimer);
+    if (failSafeTimer) window.clearTimeout(failSafeTimer);
     intro.classList.add("hidden");
-    intro.setAttribute("aria-hidden", "true");
     document.body.classList.add("loaded");
-    window.removeEventListener("keydown", onKeyDown);
+    document.body.classList.remove("intro-on");
   };
 
-  skipBtn?.addEventListener("click", finish);
-  window.addEventListener("keydown", onKeyDown);
+  if (!line1 || !line2) { finish(); return; }
 
-  // Safety: never hang on intro.
-  killTimer = setTimeout(finish, 8000);
+  const hardFinish = () => {
+    line1.textContent = WELCOME;
+    line2.textContent = MEET;
+    finish();
+  };
 
-  const scr1 = new TextScramble(line1);
-  const scr2 = new TextScramble(line2);
+  // Fail-safe: if anything goes wrong, exit the intro quickly.
+  failSafeTimer = window.setTimeout(hardFinish, 6500);
 
-  await sleep(250);
-  await scr1.setText("WELCOME TO MY WEBSITE");
-  await sleep(200);
-  await scr2.setText("MEET TRACY SHARON MORRISON", { minStart: 6, maxStart: 22, minEnd: 18, maxEnd: 52 });
-  await sleep(220);
+  skipBtn?.addEventListener("click", hardFinish);
+  window.addEventListener("keydown", (e) => { if (e.key === "Escape") hardFinish(); }, { capture: true });
 
-  finish();
+  if (prefersReducedMotion) { hardFinish(); return; }
+
+  const s1 = new TextScrambler(line1);
+  const s2 = new TextScrambler(line2);
+
+  (async () => {
+    try{
+      await sleep(150);
+      await s1.setText(WELCOME, { minStart: 0, maxStart: 10, minEnd: 18, maxEnd: 44 });
+      await sleep(120);
+      await s2.setText(MEET, { minStart: 0, maxStart: 12, minEnd: 18, maxEnd: 50 });
+      await sleep(420);
+      finish();
+    }catch(err){
+      console.error("Intro animation failed:", err);
+      hardFinish();
+    }
+  })();
 }
 
-function startIntro(){
-  runIntroScramble();
-}
 
-// Run as soon as the DOM exists (don’t wait for full page load).
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", startIntro);
-} else {
-  startIntro();
-}
-
+// Run intro even if the script loads after DOMContentLoaded (e.g., cached/hard reload edge cases)
+(() => {
+  const start = () => runIntroScramble();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start);
+  } else {
+    start();
+  }
+})();
 
 // show more projects
 const showMoreBtn = document.getElementById("showMoreBtn");

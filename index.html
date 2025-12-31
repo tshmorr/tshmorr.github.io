@@ -9,27 +9,19 @@
 </head>
 
 <body>
-  <!-- Intro overlay: Option B (password-scramble welcome) -->
-  <div id="intro" class="intro" aria-hidden="true">
-    <button id="skipIntro" class="intro-skip" type="button">Skip</button>
-
-    <div class="intro-card" role="dialog" aria-label="Intro loading screen">
+  <!-- Intro overlay -->
+  <div id="intro" class="intro" aria-hidden="false">
+    <button id="skipIntro" class="skip-btn" type="button" aria-label="Skip intro">Skip</button>
+    <div class="intro-panel" role="status" aria-live="polite">
       <div class="intro-kicker">Loading…</div>
-
-      <h1 class="intro-title">
-        <span id="scrambleLine1" class="scramble"></span>
-        <span class="scramble-cursor" aria-hidden="true"></span>
-      </h1>
-
-      <p class="intro-sub">
-        <span id="scrambleLine2" class="scramble"></span>
-      </p>
-
-      <div class="intro-hint">Tip: press <span class="kbd">Esc</span> to skip</div>
+      <div class="scramble-wrap">
+        <div id="scrambleLine1" class="scramble"></div>
+        <div id="scrambleLine2" class="scramble scramble-sub"></div>
+      </div>
+      <div class="intro-tip">Tip: press <kbd>Esc</kbd> to skip</div>
+      <div class="intro-progress" aria-hidden="true"><span></span></div>
     </div>
   </div>
-
-
   <!-- Left social rail -->
   <aside class="rail rail-left" aria-label="Social links">
     <a class="icon" href="https://github.com/tshmorr" target="_blank" rel="noreferrer" aria-label="GitHub">
@@ -284,7 +276,10 @@
     </footer>
   </main>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=2" defer></script>
 </body>
+
+  <!-- Intro overlay: Option B (equation morph) -->
+
 
 </html>

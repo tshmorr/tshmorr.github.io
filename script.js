@@ -1,92 +1,161 @@
 // year in footer
-document.getElementById("year").textContent = new Date().getFullYear();
+document.getElementById("year")?.textContent = new Date().getFullYear();
 
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
-async function morphTo(el, newText, subEl, newSub){
-  // animate out
-  el.classList.add("morph-out");
-  el.classList.remove("morph-in");
-  await sleep(240);
+/**
+ * Password-scramble text effect (per-character "cracking" until it resolves).
+ * Based on a requestAnimationFrame loop for smoothness.
+ */
+class TextScrambler {
+  constructor(el, {
+    chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*+-=?"
+  } = {}) {
+    this.el = el;
+    this.chars = chars;
+    this.queue = [];
+    this.frame = 0;
+    this.frameRequest = 0;
+    this.resolve = () => {};
+  }
 
-  // swap
-  el.textContent = newText;
-  if (subEl && newSub) subEl.innerHTML = newSub;
+  randomChar(){
+    return this.chars[Math.floor(Math.random() * this.chars.length)];
+  }
 
-  // animate in
-  el.classList.remove("morph-out");
-  el.classList.add("morph-in");
-  await sleep(360);
+  setText(newText, {
+    minStart = 0, maxStart = 18,
+    minEnd = 16, maxEnd = 44
+  } = {}) {
+    const oldText = this.el.textContent || "";
+    const length = Math.max(oldText.length, newText.length);
+
+    this.queue = [];
+    for (let i = 0; i < length; i++) {
+      const from = oldText[i] || "";
+      const to = newText[i] || "";
+      const start = minStart + Math.floor(Math.random() * (maxStart - minStart + 1));
+      const end = start + minEnd + Math.floor(Math.random() * (maxEnd - minEnd + 1));
+      this.queue.push({ from, to, start, end, char: "" });
+    }
+
+    cancelAnimationFrame(this.frameRequest);
+    this.frame = 0;
+
+    return new Promise(resolve => {
+      this.resolve = resolve;
+      this.update();
+    });
+  }
+
+  update(){
+    let output = "";
+    let complete = 0;
+
+    for (let i = 0; i < this.queue.length; i++) {
+      const { from, to, start, end } = this.queue[i];
+
+      // Preserve spaces cleanly
+      if (to === " ") {
+        output += " ";
+        if (this.frame >= end) complete++;
+        continue;
+      }
+
+      if (this.frame >= end) {
+        complete++;
+        output += to;
+      } else if (this.frame >= start) {
+        // show random characters while "cracking"
+        if (!this.queue[i].char || Math.random() < 0.28) {
+          this.queue[i].char = this.randomChar();
+        }
+        output += `<span class="dud">${this.queue[i].char}</span>`;
+      } else {
+        output += from;
+      }
+    }
+
+    this.el.innerHTML = output;
+
+    if (complete === this.queue.length) {
+      // lock to final textContent for accessibility / copy-paste
+      const finalText = this.queue.map(q => q.to).join("");
+      this.el.textContent = finalText;
+      this.resolve();
+    } else {
+      this.frameRequest = requestAnimationFrame(() => {
+        this.frame++;
+        this.update();
+      });
+    }
+  }
+
+  stop(){
+    cancelAnimationFrame(this.frameRequest);
+  }
 }
 
-async function runIntroMorph(){
+function runIntroScramble(){
   const intro = document.getElementById("intro");
   const skipBtn = document.getElementById("skipIntro");
-  const morphText = document.getElementById("morphText");
-  const morphSub = document.getElementById("morphSub");
+  const line1 = document.getElementById("scrambleLine1");
+  const line2 = document.getElementById("scrambleLine2");
 
-  if (!intro || !morphText) {
-    document.body.classList.add("loaded");
-    return;
-  }
+  const WELCOME = "WELCOME TO MY WEBSITE";
+  const MEET = "MEET TRACY SHARON MORRISON";
 
-  // reduced motion: skip animation
-  if (prefersReducedMotion){
-    intro.classList.add("hidden");
-    document.body.classList.add("loaded");
-    return;
-  }
-
-  let done = false;
   const finish = () => {
-    if (done) return;
-    done = true;
-    intro.classList.add("hidden");
+    intro?.classList.add("hidden");
     document.body.classList.add("loaded");
   };
 
-  skipBtn?.addEventListener("click", finish);
+  // If intro markup isn't present, just reveal the page
+  if (!intro || !line1 || !line2) {
+    document.body.classList.add("loaded");
+    return;
+  }
 
-  // start visible
-  morphText.classList.add("morph-in");
+  // Reduced motion: no intro animation
+  if (prefersReducedMotion) {
+    line1.textContent = WELCOME;
+    line2.textContent = MEET;
+    finish();
+    return;
+  }
 
-  // Sequence (edit these to match your vibe!)
-  await sleep(350);
-  await morphTo(
-    morphText,
-    "T, M",
-    morphSub,
-    `<span class="mono">T</span>: total • <span class="mono">M</span>: model`
-  );
+  const s1 = new TextScrambler(line1);
+  const s2 = new TextScrambler(line2);
 
-  await morphTo(
-    morphText,
-    "θ, μ",
-    morphSub,
-    `<span class="mono">θ</span> (area effects) • <span class="mono">μ</span> (global mean)`
-  );
+  const hardFinish = () => {
+    s1.stop(); s2.stop();
+    line1.textContent = WELCOME;
+    line2.textContent = MEET;
+    finish();
+  };
 
-  await morphTo(
-    morphText,
-    "σ²",
-    morphSub,
-    `heteroscedasticity: <span class="mono">Var(y|θ)=σ²</span>`
-  );
+  // Skip controls
+  skipBtn?.addEventListener("click", hardFinish);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") hardFinish();
+  });
 
-  await morphTo(
-    morphText,
-    "p(θ | y)",
-    morphSub,
-    `posterior ready ✓`
-  );
+  // Play sequence
+  (async () => {
+    await sleep(250);
+    await s1.setText(WELCOME, { minStart: 0, maxStart: 12, minEnd: 18, maxEnd: 48 });
+    await sleep(120);
+    await s2.setText(MEET, { minStart: 0, maxStart: 16, minEnd: 18, maxEnd: 56 });
 
-  await sleep(300);
-  finish();
+    await sleep(450);
+    finish();
+  })();
 }
 
-window.addEventListener("load", runIntroMorph);
+// Start intro as soon as DOM is ready (script is at the end of <body>, so this is immediate)
+runIntroScramble();
 
 
 // show more projects

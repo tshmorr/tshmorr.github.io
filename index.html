@@ -265,4 +265,25 @@
 
   <script src="script.js"></script>
 </body>
+
+  <!-- Intro overlay: Option B (equation morph) -->
+<div id="intro" class="intro" aria-hidden="true">
+  <button id="skipIntro" class="intro-skip" type="button">Skip</button>
+
+  <div class="morph-wrap">
+    <div class="morph-kicker">Building the model…</div>
+
+    <div class="morph-main" aria-label="Intro equation morph">
+      <span id="morphText" class="morph-text">TM</span>
+      <span class="morph-cursor" aria-hidden="true"></span>
+    </div>
+
+    <div id="morphSub" class="morph-sub">
+      <span class="mono">y</span> → <span class="mono">θ</span> → <span class="mono">posterior</span>
+    </div>
+
+    <div class="morph-bar" aria-hidden="true"></div>
+  </div>
+</div>
+
 </html>
